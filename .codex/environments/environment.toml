@@ -10,3 +10,7 @@ command = "./script/build_and_run.sh --build-only"
 [actions.run]
 name = "Build & Run"
 command = "./script/build_and_run.sh"
+
+[actions.install]
+name = "Build, Sign & Install"
+command = "./script/build_and_install.sh"

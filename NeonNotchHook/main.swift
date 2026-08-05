@@ -3,8 +3,10 @@ import Foundation
 
 private struct EventEnvelope: Codable {
     let schemaVersion: Int
+    let eventID: String
     let source: String
     let event: String
+    let notificationSubtype: String?
     let sessionID: String
     let agentID: String?
     let parentAgentID: String?
@@ -15,6 +17,11 @@ private struct EventEnvelope: Codable {
 
 private let arguments = CommandLine.arguments
 private let source = arguments.dropFirst().first == "claudeCode" ? "claudeCode" : "codex"
+
+if arguments.contains("--self-test") {
+    print("NeonNotchHook schema=2 ready")
+    exit(EXIT_SUCCESS)
+}
 
 private func readPayload() -> [String: Any] {
     var data = FileHandle.standardInput.readDataToEndOfFile()
@@ -51,8 +58,7 @@ private func sanitize(_ value: String) -> String {
 private func eventSummary(event: String, payload: [String: Any]) -> String {
     let normalized = event.lowercased()
     if normalized.contains("permission") || normalized.contains("approval") {
-        let tool = firstString(["tool_name", "toolName"], in: payload) ?? "ação"
-        return "Aprovação necessária para \(tool)"
+        return "Aprovação necessária"
     }
     if normalized.contains("subagentstart") || normalized.contains("subagent_start") {
         return sanitize(firstString(["agent_type", "agentType", "name"], in: payload) ?? "Subagente iniciado")
@@ -63,13 +69,25 @@ private func eventSummary(event: String, payload: [String: Any]) -> String {
     if normalized == "stop" || normalized.contains("sessionend") || normalized.contains("session_end") {
         return "Trabalho concluído"
     }
-    if normalized.contains("notification") || normalized.contains("input") {
-        return sanitize(firstString(["title", "message", "reason"], in: payload) ?? "Interação necessária")
+    if normalized.contains("notification") {
+        let subtype = firstString(
+            ["notification_type", "notificationType", "notification_subtype", "notificationSubtype", "subtype"],
+            in: payload
+        )?.lowercased()
+        let needsAttention = subtype.map {
+            ["permission_prompt", "idle_prompt", "input_needed", "approval_requested"].contains($0)
+        } ?? false
+        return needsAttention
+            ? "Interação necessária"
+            : "Atualização do agente"
+    }
+    if normalized.contains("input") {
+        return "Interação necessária"
     }
     if normalized.contains("prompt") {
         return "Nova tarefa em andamento"
     }
-    return sanitize(firstString(["summary", "title", "reason"], in: payload) ?? event)
+    return sanitize(event)
 }
 
 private func append(_ event: EventEnvelope) {
@@ -100,6 +118,10 @@ private func append(_ event: EventEnvelope) {
 
 let payload = readPayload()
 let eventName = firstString(["hook_event_name", "event", "event_name", "type"], in: payload) ?? "unknown"
+let notificationSubtype = firstString(
+    ["notification_type", "notificationType", "notification_subtype", "notificationSubtype", "subtype"],
+    in: payload
+)
 let sessionID = firstString(["session_id", "sessionId", "thread_id", "threadId"], in: payload) ?? UUID().uuidString
 let agentID = firstString(["agent_id", "agentId", "subagent_id", "subagentId"], in: payload)
 let parentAgentID = firstString(["parent_agent_id", "parentAgentId"], in: payload)
@@ -107,9 +129,11 @@ let directory = firstString(["cwd", "working_directory", "workingDirectory"], in
     ?? FileManager.default.currentDirectoryPath
 
 append(EventEnvelope(
-    schemaVersion: 1,
+    schemaVersion: 2,
+    eventID: UUID().uuidString,
     source: source,
     event: eventName,
+    notificationSubtype: notificationSubtype,
     sessionID: sessionID,
     agentID: agentID,
     parentAgentID: parentAgentID,

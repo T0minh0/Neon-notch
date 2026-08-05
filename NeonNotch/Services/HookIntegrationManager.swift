@@ -14,6 +14,8 @@ final class HookIntegrationManager: ObservableObject {
     @Published private(set) var claudeHealth: IntegrationHealth = .notInstalled
     @Published private(set) var isWorking = false
     @Published private(set) var lastMessage: String?
+    @Published private(set) var codexReadiness = ProviderReadiness.unavailable("Codex não detectado.")
+    @Published private(set) var claudeReadiness = ProviderReadiness.unavailable("Claude Code não detectado.")
 
     private let codexEvents = ["SessionStart", "UserPromptSubmit", "PermissionRequest", "SubagentStart", "SubagentStop", "Stop", "SessionEnd"]
     private let claudeEvents = ["SessionStart", "UserPromptSubmit", "PermissionRequest", "Notification", "SubagentStart", "SubagentStop", "Stop", "SessionEnd"]
@@ -38,13 +40,30 @@ final class HookIntegrationManager: ObservableObject {
         let helperExists = FileManager.default.isExecutableFile(atPath: helperURL.path)
         let codexConfigured = configurationContainsHelper(at: codexHooksURL)
         let claudeConfigured = configurationContainsHelper(at: claudeSettingsURL)
+        let activities = lastActivitiesBySource()
         codexHealth = integrationHealth(helperExists: helperExists, configured: codexConfigured)
         claudeHealth = integrationHealth(helperExists: helperExists, configured: claudeConfigured)
         health = codexHealth == .installed && claudeHealth == .installed
             ? .installed
-            : (helperExists || codexConfigured || claudeConfigured
+            : (codexConfigured || claudeConfigured
                 ? .needsRepair("One or more integration files are incomplete")
                 : .notInstalled)
+        codexReadiness = readiness(
+            source: .codex,
+            available: FileManager.default.fileExists(atPath: homeDirectory.appendingPathComponent(".codex").path),
+            helperExists: helperExists,
+            configured: codexConfigured,
+            lastActivity: activities[.codex],
+            requiresTrust: true
+        )
+        claudeReadiness = readiness(
+            source: .claudeCode,
+            available: FileManager.default.fileExists(atPath: homeDirectory.appendingPathComponent(".claude").path),
+            helperExists: helperExists,
+            configured: claudeConfigured,
+            lastActivity: activities[.claudeCode],
+            requiresTrust: false
+        )
     }
 
     func installOrRepair() throws {
@@ -59,6 +78,32 @@ final class HookIntegrationManager: ObservableObject {
         lastMessage = "Integrações instaladas. Reinicie sessões abertas para ativar os hooks."
     }
 
+    func installHelperOnly() throws {
+        isWorking = true
+        defer { isWorking = false }
+        try FileManager.default.createDirectory(at: supportDirectory, withIntermediateDirectories: true)
+        try FileManager.default.createDirectory(at: helperURL.deletingLastPathComponent(), withIntermediateDirectories: true)
+        try installHelper()
+        refreshHealth()
+        lastMessage = "Helper v2 instalado. Configure Codex e Claude Code na próxima etapa."
+    }
+
+    func installOrRepair(_ source: AgentSource) throws {
+        isWorking = true
+        defer { isWorking = false }
+        try FileManager.default.createDirectory(at: supportDirectory, withIntermediateDirectories: true)
+        try FileManager.default.createDirectory(at: helperURL.deletingLastPathComponent(), withIntermediateDirectories: true)
+        if !FileManager.default.isExecutableFile(atPath: helperURL.path) { try installHelper() }
+        switch source {
+        case .codex:
+            try mergeHooks(at: codexHooksURL, events: codexEvents, source: "codex")
+        case .claudeCode:
+            try mergeHooks(at: claudeSettingsURL, events: claudeEvents, source: "claudeCode")
+        }
+        refreshHealth()
+        lastMessage = "Integração do \(source.title) instalada. Reinicie sessões abertas para ativar os hooks."
+    }
+
     func remove() throws {
         isWorking = true
         defer { isWorking = false }
@@ -69,10 +114,80 @@ final class HookIntegrationManager: ObservableObject {
         lastMessage = "Integrações removidas; os backups foram preservados."
     }
 
+    func testHelper() async -> Bool {
+        guard FileManager.default.isExecutableFile(atPath: helperURL.path) else {
+            lastMessage = "O helper ainda não está instalado."
+            return false
+        }
+        isWorking = true
+        defer { isWorking = false }
+        let result = await ProcessRunner.run(helperURL.path, arguments: ["--self-test"])
+        if result.status == 0, result.stdout.contains("schema=2") {
+            lastMessage = "Helper v2 respondeu corretamente."
+            return true
+        }
+        lastMessage = result.stderr.sanitizedSummary.isEmpty
+            ? "O helper não respondeu ao autoteste."
+            : result.stderr.sanitizedSummary
+        return false
+    }
+
     private func integrationHealth(helperExists: Bool, configured: Bool) -> IntegrationHealth {
         if helperExists && configured { return .installed }
-        if helperExists || configured { return .needsRepair("Configuração incompleta") }
+        if configured { return .needsRepair("Helper ausente") }
         return .notInstalled
+    }
+
+    private func readiness(
+        source: AgentSource,
+        available: Bool,
+        helperExists: Bool,
+        configured: Bool,
+        lastActivity: Date?,
+        requiresTrust: Bool
+    ) -> ProviderReadiness {
+        let state: ProviderReadinessState
+        let detail: String
+        if !available {
+            state = .unavailable
+            detail = "\(source.title) não foi detectado neste Mac."
+        } else if !configured {
+            state = .setupRequired
+            detail = helperExists ? "Configure os hooks deste provider." : "Instale o helper e configure os hooks."
+        } else if !helperExists {
+            state = .degraded
+            detail = "A integração está incompleta e precisa de reparo."
+        } else if requiresTrust && lastActivity == nil {
+            state = .awaitingTrust
+            detail = "Revise e aprove o hook pelo comando /hooks no Codex."
+        } else {
+            state = .ready
+            detail = lastActivity == nil ? "Integração configurada; aguardando a primeira sessão." : "Eventos recebidos normalmente."
+        }
+        return ProviderReadiness(
+            state: state,
+            isAvailable: available,
+            detectedVersion: nil,
+            isConfigured: configured,
+            isTrusted: requiresTrust ? lastActivity != nil : nil,
+            lastActivity: lastActivity,
+            detail: detail
+        )
+    }
+
+    private func lastActivitiesBySource() -> [AgentSource: Date] {
+        let eventLog = supportDirectory.appendingPathComponent("agent-events.jsonl")
+        guard let data = try? Data(contentsOf: eventLog) else { return [:] }
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .iso8601
+        var activities: [AgentSource: Date] = [:]
+        for line in data.split(separator: 0x0A).suffix(1_000) {
+            guard let event = try? decoder.decode(AgentHookEvent.self, from: Data(line)) else { continue }
+            if event.timestamp > (activities[event.source] ?? .distantPast) {
+                activities[event.source] = event.timestamp
+            }
+        }
+        return activities
     }
 
     private var codexHooksURL: URL {
@@ -142,8 +257,18 @@ final class HookIntegrationManager: ObservableObject {
     }
 
     private func configurationContainsHelper(at url: URL) -> Bool {
-        guard let data = try? Data(contentsOf: url), let text = String(data: data, encoding: .utf8) else { return false }
-        return text.contains(helperURL.path)
+        guard let data = try? Data(contentsOf: url),
+              let object = try? JSONSerialization.jsonObject(with: data) else { return false }
+        return containsHelper(in: object)
+    }
+
+    private func containsHelper(in value: Any) -> Bool {
+        if let text = value as? String { return text.contains(helperURL.path) }
+        if let array = value as? [Any] { return array.contains(where: containsHelper) }
+        if let dictionary = value as? [String: Any] {
+            return dictionary.values.contains(where: containsHelper)
+        }
+        return false
     }
 
     private func backup(_ url: URL) throws {

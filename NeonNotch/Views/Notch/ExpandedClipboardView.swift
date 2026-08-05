@@ -108,7 +108,12 @@ struct ExpandedClipboardView: View {
                 .fill(NeonTheme.raised.opacity(0.68))
                 .overlay {
                     RoundedRectangle(cornerRadius: 12, style: .continuous)
-                        .stroke(entry.isPinned ? NeonTheme.magenta.opacity(0.4) : NeonTheme.separator, lineWidth: 0.75)
+                        .stroke(
+                            model.selectedClipboardID == entry.id
+                                ? NeonTheme.cyan.opacity(0.9)
+                                : (entry.isPinned ? NeonTheme.magenta.opacity(0.4) : NeonTheme.separator),
+                            lineWidth: model.selectedClipboardID == entry.id ? 1.25 : 0.75
+                        )
                 }
                 .allowsHitTesting(false)
         }

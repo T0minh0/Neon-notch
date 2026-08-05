@@ -10,6 +10,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         AppModel.shared.start()
         panelController = NotchPanelController(model: AppModel.shared)
         panelController?.show()
+
+        let shouldPresentOnboarding = AppModel.shared.showsOnboarding
+        DispatchQueue.main.async { [weak self] in
+            // SwiftUI scenes created by an older build may still be restored once.
+            // The daily-driver launch owns only the notch until explicitly opened.
+            for window in NSApp.windows where self?.panelController?.owns(window) != true {
+                window.isRestorable = false
+                window.close()
+            }
+            if shouldPresentOnboarding {
+                NotificationCenter.default.post(name: .openControlCenter, object: nil)
+            }
+        }
     }
 
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
@@ -26,5 +39,5 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
 extension Notification.Name {
     static let openControlCenter = Notification.Name("NeonNotch.openControlCenter")
+    static let globalShortcutTriggered = Notification.Name("NeonNotch.globalShortcutTriggered")
 }
-

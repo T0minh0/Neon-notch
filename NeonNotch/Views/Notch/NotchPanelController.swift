@@ -56,8 +56,17 @@ final class NotchPanelController {
 
         let center = NotificationCenter.default
         center.publisher(for: NSApplication.didChangeScreenParametersNotification)
-            .merge(with: center.publisher(for: NSWorkspace.didWakeNotification))
-            .sink { [weak self] _ in self?.setFrame(for: model.panelState) }
+            .merge(with: NSWorkspace.shared.notificationCenter.publisher(for: NSWorkspace.didWakeNotification))
+            .sink { [weak self] notification in
+                self?.setFrame(for: model.panelState)
+                if notification.name == NSWorkspace.didWakeNotification { model.handleWake() }
+            }
+            .store(in: &cancellables)
+        center.publisher(for: .globalShortcutTriggered)
+            .sink { [weak self] _ in
+                guard let self else { return }
+                self.panel.makeKeyAndOrderFront(nil)
+            }
             .store(in: &cancellables)
         installEventMonitors()
     }
@@ -67,6 +76,10 @@ final class NotchPanelController {
         renderingState.renderedState = model.panelState
         setFrame(for: model.panelState)
         panel.orderFrontRegardless()
+    }
+
+    func owns(_ window: NSWindow) -> Bool {
+        window === panel
     }
 
     private func configurePanel() {
@@ -91,9 +104,12 @@ final class NotchPanelController {
             }
         }
         keyMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] event in
-            guard event.keyCode == 53, let self else { return event }
-            self.model.collapsePanel()
-            return nil
+            guard let self, self.model.panelState == .expanded, self.panel.isKeyWindow else { return event }
+            if event.keyCode == 53 {
+                self.model.collapsePanel()
+                return nil
+            }
+            return self.model.handlePanelKeyEvent(event) ? nil : event
         }
     }
 

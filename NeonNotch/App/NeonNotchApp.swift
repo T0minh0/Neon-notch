@@ -13,6 +13,7 @@ struct NeonNotchApp: App {
         }
         .defaultSize(width: 1040, height: 720)
         .defaultLaunchBehavior(.suppressed)
+        .restorationBehavior(.disabled)
         .commands {
             CommandGroup(after: .appInfo) {
                 OpenWindowButton(title: "Open Control Center", windowID: "controlCenter")
@@ -25,6 +26,7 @@ struct NeonNotchApp: App {
                 .preferredColorScheme(.dark)
                 .frame(width: 580, height: 470)
         }
+        .restorationBehavior(.disabled)
     }
 }
 
@@ -41,4 +43,3 @@ private struct OpenWindowButton: View {
             }
     }
 }
-
