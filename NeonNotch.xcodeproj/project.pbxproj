@@ -31,6 +31,10 @@
 		B023 /* NeonNotchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F023 /* NeonNotchTests.swift */; };
 		B024 /* demo-album-art.png in Resources */ = {isa = PBXBuildFile; fileRef = F026 /* demo-album-art.png */; };
 		B025 /* ExpandedClipboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F027 /* ExpandedClipboardView.swift */; };
+		B026 /* AgentEventStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = F028 /* AgentEventStore.swift */; };
+		B027 /* GlobalHotKeyService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F029 /* GlobalHotKeyService.swift */; };
+		B028 /* PermissionDiagnosticsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F030 /* PermissionDiagnosticsService.swift */; };
+		B029 /* DailyDriverViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = F031 /* DailyDriverViews.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -71,6 +75,10 @@
 		F025 /* NeonNotch.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = NeonNotch.entitlements; sourceTree = "<group>"; };
 		F026 /* demo-album-art.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Resources/demo-album-art.png; sourceTree = "<group>"; };
 		F027 /* ExpandedClipboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Notch/ExpandedClipboardView.swift; sourceTree = "<group>"; };
+		F028 /* AgentEventStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/AgentEventStore.swift; sourceTree = "<group>"; };
+		F029 /* GlobalHotKeyService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/GlobalHotKeyService.swift; sourceTree = "<group>"; };
+		F030 /* PermissionDiagnosticsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/PermissionDiagnosticsService.swift; sourceTree = "<group>"; };
+		F031 /* DailyDriverViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Settings/DailyDriverViews.swift; sourceTree = "<group>"; };
 		PR001 /* Neon Notch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Neon Notch.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		PR002 /* NeonNotchHook */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = NeonNotchHook; sourceTree = BUILT_PRODUCTS_DIR; };
 		PR003 /* NeonNotchTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NeonNotchTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -90,7 +98,7 @@
 		};
 		G002 /* NeonNotch */ = {
 			isa = PBXGroup;
-			children = (F001, F002, F003, F004, F005, F006, F007, F008, F009, F010, F011, F012, F013, F014, F015, F016, F017, F018, F019, F020, F021, F024, F025, F026, F027);
+			children = (F001, F002, F003, F004, F005, F006, F007, F008, F009, F010, F011, F012, F013, F014, F015, F016, F017, F018, F019, F020, F021, F024, F025, F026, F027, F028, F029, F030, F031);
 			path = NeonNotch;
 			sourceTree = "<group>";
 		};
@@ -170,7 +178,7 @@
 		PHS001 = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
-			files = (B001, B002, B003, B004, B005, B006, B007, B008, B009, B010, B011, B012, B013, B014, B015, B016, B017, B018, B019, B020, B021, B025);
+			files = (B001, B002, B003, B004, B005, B006, B007, B008, B009, B010, B011, B012, B013, B014, B015, B016, B017, B018, B019, B020, B021, B025, B026, B027, B028, B029);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		PHS002 = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (B022); runOnlyForDeploymentPostprocessing = 0; };
@@ -189,14 +197,14 @@
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = NeonNotch/NeonNotch.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEFINES_MODULE = YES;
 				ENABLE_TESTABILITY = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = NeonNotch/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
-				MARKETING_VERSION = 0.1.0;
+				MARKETING_VERSION = 0.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.cammis.NeonNotch;
 				PRODUCT_MODULE_NAME = NeonNotch;
 				PRODUCT_NAME = "Neon Notch";
@@ -210,13 +218,13 @@
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = NeonNotch/NeonNotch.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEFINES_MODULE = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = NeonNotch/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
-				MARKETING_VERSION = 0.1.0;
+				MARKETING_VERSION = 0.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.cammis.NeonNotch;
 				PRODUCT_MODULE_NAME = NeonNotch;
 				PRODUCT_NAME = "Neon Notch";

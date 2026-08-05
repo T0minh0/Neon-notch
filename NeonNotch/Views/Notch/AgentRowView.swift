@@ -2,6 +2,7 @@ import SwiftUI
 
 struct AgentRowView: View {
     let agent: AgentSnapshot
+    var isSelected = false
     let openAction: () -> Void
 
     var body: some View {
@@ -55,9 +56,15 @@ struct AgentRowView: View {
         .padding(.vertical, 9)
         .frame(minHeight: 70)
         .neonCard(status: agent.status)
+        .overlay {
+            if isSelected {
+                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                    .stroke(NeonTheme.cyan.opacity(0.9), lineWidth: 1.25)
+                    .allowsHitTesting(false)
+            }
+        }
         .contextMenu {
             Button("Open Session", action: openAction)
         }
     }
 }
-

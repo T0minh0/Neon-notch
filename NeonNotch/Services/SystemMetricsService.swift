@@ -57,9 +57,26 @@ final class SystemMetricsService: MetricsProvider {
         var pageSize: vm_size_t = 0
         host_page_size(mach_host_self(), &pageSize)
         let total = ProcessInfo.processInfo.physicalMemory
-        let freePages = UInt64(stats.free_count + stats.speculative_count)
-        let free = freePages * UInt64(pageSize)
-        return (total > free ? total - free : 0, total)
+        let used = Self.memoryUsed(
+            totalBytes: total,
+            pageSize: UInt64(pageSize),
+            freePages: UInt64(stats.free_count),
+            fileBackedPages: UInt64(stats.external_page_count)
+        )
+        return (used, total)
+    }
+
+    nonisolated static func memoryUsed(
+        totalBytes: UInt64,
+        pageSize: UInt64,
+        freePages: UInt64,
+        fileBackedPages: UInt64
+    ) -> UInt64 {
+        let (reclaimablePages, pageOverflow) = freePages.addingReportingOverflow(fileBackedPages)
+        guard !pageOverflow else { return 0 }
+        let (reclaimableBytes, byteOverflow) = reclaimablePages.multipliedReportingOverflow(by: pageSize)
+        guard !byteOverflow else { return 0 }
+        return totalBytes > reclaimableBytes ? totalBytes - reclaimableBytes : 0
     }
 
     private func diskUsage() -> (used: UInt64, total: UInt64) {
@@ -96,4 +113,3 @@ final class SystemMetricsService: MetricsProvider {
         )
     }
 }
-

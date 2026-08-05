@@ -19,6 +19,16 @@ struct SettingsView: View {
                     Toggle("Som dos alertas", isOn: $model.alertSoundsEnabled)
                 }
 
+                Section("Atalho global") {
+                    ShortcutRecorderView(service: model.globalHotKey)
+                }
+
+                if !model.onboardingCompleted {
+                    Section("Primeiro uso") {
+                        Button("Retomar onboarding") { model.resumeOnboarding() }
+                    }
+                }
+
                 Section("Privacidade") {
                     Text("Prompts, respostas, comandos e parâmetros de ferramentas nunca são persistidos. O histórico fica somente neste Mac.")
                         .font(.caption)
@@ -36,6 +46,23 @@ struct SettingsView: View {
             }
             .padding(20)
             .tabItem { Label("Geral", systemImage: "gearshape") }
+
+            VStack(alignment: .leading, spacing: 14) {
+                HStack {
+                    VStack(alignment: .leading, spacing: 3) {
+                        Text("Status do Daily Driver").font(.headline)
+                        Text("Permissões e integrações verificadas localmente.")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    Spacer()
+                    Button("Atualizar") { model.refreshDiagnostics() }
+                }
+                ReadinessStatusView(model: model, showsRecoveryActions: true)
+            }
+            .padding(20)
+            .task { model.refreshDiagnostics() }
+            .tabItem { Label("Status", systemImage: "checklist") }
 
             Form {
                 integrationRow(
@@ -60,7 +87,7 @@ struct SettingsView: View {
                     }
                 }
 
-                if let message = model.integrations.lastMessage {
+                if let message = model.integrationMessage {
                     Text(message)
                         .font(.caption)
                         .foregroundStyle(.secondary)
@@ -79,7 +106,7 @@ struct SettingsView: View {
             .padding(20)
             .tabItem { Label("Sobre", systemImage: "info.circle") }
         }
-        .frame(width: 620, height: 390)
+        .frame(width: 680, height: 540)
         .preferredColorScheme(.dark)
     }
 

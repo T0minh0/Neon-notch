@@ -2,9 +2,16 @@
 
 App nativo para macOS 26+ que transforma o notch do MacBook em um painel local para agentes, Spotify, métricas e clipboard.
 
+## Daily Driver 0.2
+
+- Primeiro uso retomável com diagnóstico de instalação, helper, Codex, Claude Code, notificações, Automação e início no login.
+- Atalho global padrão `Control + Option + Space`, configurável em Ajustes, com navegação integral por teclado.
+- Hooks schema v2 deduplicados, snapshots atômicos e retenção local limitada; eventos antigos não repetem alertas após relaunch.
+- Notificações de atenção abrem a sessão correspondente e oferecem fallback recuperável na central.
+
 ## Executar
 
-Requisitos: macOS 26+, Xcode 26.6+ e Swift 6.3.
+Requisitos: macOS 26+, Xcode 26.6+ e Swift 6.3. O comando abaixo continua sendo o fluxo Debug e não altera a instalação pessoal.
 
 ```bash
 ./script/build_and_run.sh
@@ -17,6 +24,22 @@ DerivedData/Build/Products/Debug/Neon Notch.app
 ```
 
 Os hooks do Codex e Claude Code **não são instalados durante o build**. A instalação acontece somente pelo onboarding ou por Ajustes → Integrações, sempre com backup e merge idempotente.
+
+## Instalação pessoal assinada
+
+Na primeira vez, crie a identidade local de code signing no Keychain. O macOS pode pedir sua confirmação:
+
+```bash
+./script/setup_local_signing.sh
+```
+
+Depois, compile, assine, valide e instale a versão Release em `~/Applications`:
+
+```bash
+./script/build_and_install.sh
+```
+
+Esse fluxo nunca usa assinatura ad hoc. O helper é assinado antes do app, o bundle é validado com `codesign --deep --strict` e a troca é transacional. A versão instalada anterior permanece recuperável em `~/Applications/Neon Notch.previous.app` após uma atualização bem-sucedida.
 
 ## Testes
 
@@ -56,7 +79,8 @@ launchctl unsetenv NEON_NOTCH_PREVIEW_SECTION
 - `NeonNotchHook`: executável pequeno que recebe JSON via stdin e anexa eventos sanitizados em JSONL.
 - `NeonNotchTests`: redução de eventos, sanitização, retenção, hashing e ciclo idempotente de configurações.
 - `Design`: mock aprovado, capa de demonstração e evidências visuais locais.
-- `script/build_and_run.sh`: caminho canônico de build/run para Xcode e Codex.
+- `script/build_and_run.sh`: caminho canônico de build/run Debug para Xcode e Codex.
+- `script/build_and_install.sh`: build Release, assinatura estável e instalação pessoal transacional.
 
 ## Privacidade
 

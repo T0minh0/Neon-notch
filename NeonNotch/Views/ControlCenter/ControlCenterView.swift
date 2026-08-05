@@ -3,20 +3,33 @@ import SwiftUI
 
 struct ControlCenterView: View {
     @ObservedObject var model: AppModel
-    @State private var selection: ControlCenterSection? = .agents
     @State private var searchText = ""
 
     var body: some View {
         NavigationSplitView {
-            List(ControlCenterSection.allCases, selection: $selection) { section in
+            List(ControlCenterSection.allCases, selection: $model.requestedControlCenterSection) { section in
                 Label(section.title, systemImage: section.symbol)
                     .tag(section)
             }
             .navigationTitle("Neon Notch")
             .navigationSplitViewColumnWidth(min: 180, ideal: 210)
+            .safeAreaInset(edge: .bottom) {
+                if !model.onboardingCompleted {
+                    Button {
+                        model.resumeOnboarding()
+                    } label: {
+                        Label("Configuração pendente", systemImage: "exclamationmark.circle")
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+                    .buttonStyle(.plain)
+                    .foregroundStyle(NeonTheme.magenta)
+                    .padding(12)
+                    .background(NeonTheme.raised)
+                }
+            }
         } detail: {
             Group {
-                switch selection ?? .agents {
+                switch model.requestedControlCenterSection {
                 case .agents:
                     AgentsDashboard(model: model, searchText: searchText)
                 case .clipboard:
@@ -33,70 +46,6 @@ struct ControlCenterView: View {
         .sheet(isPresented: $model.showsOnboarding) {
             OnboardingView(model: model)
         }
-    }
-}
-
-private struct OnboardingView: View {
-    @ObservedObject var model: AppModel
-
-    var body: some View {
-        VStack(spacing: 24) {
-            ZStack {
-                Circle().fill(NeonTheme.cyan.opacity(0.12))
-                Image(systemName: "rectangle.topthird.inset.filled")
-                    .font(.system(size: 34, weight: .semibold))
-                    .foregroundStyle(NeonTheme.cyan)
-            }
-            .frame(width: 74, height: 74)
-            .shadow(color: NeonTheme.cyan.opacity(0.35), radius: 20)
-
-            VStack(spacing: 8) {
-                Text("Seu command deck está pronto")
-                    .font(.title2.weight(.bold))
-                Text("Conecte os agentes e deixe o Neon Notch iniciar silenciosamente com o macOS. Nenhum conteúdo sai deste Mac.")
-                    .multilineTextAlignment(.center)
-                    .foregroundStyle(.secondary)
-                    .frame(maxWidth: 470)
-            }
-
-            VStack(spacing: 12) {
-                onboardingRow("Codex + Claude Code", detail: "Hooks locais com resumo sanitizado", symbol: "point.3.connected.trianglepath.dotted")
-                onboardingRow("Spotify", detail: "Controle por Apple Events, sem OAuth", symbol: "music.note")
-                onboardingRow("Privacidade", detail: "Clipboard e métricas ficam somente no Mac", symbol: "lock.shield")
-            }
-
-            HStack {
-                Button("Agora não") { model.completeOnboarding() }
-                Spacer()
-                Button("Configurar tudo") {
-                    model.installIntegrations()
-                    model.setLaunchAtLogin(true)
-                    model.completeOnboarding()
-                }
-                .buttonStyle(.borderedProminent)
-                .tint(NeonTheme.magenta)
-            }
-        }
-        .padding(32)
-        .frame(width: 590)
-        .background(NeonTheme.background)
-        .preferredColorScheme(.dark)
-    }
-
-    private func onboardingRow(_ title: String, detail: String, symbol: String) -> some View {
-        HStack(spacing: 14) {
-            Image(systemName: symbol)
-                .foregroundStyle(NeonTheme.cyan)
-                .frame(width: 34, height: 34)
-                .background(NeonTheme.cyan.opacity(0.10), in: RoundedRectangle(cornerRadius: 10))
-            VStack(alignment: .leading, spacing: 2) {
-                Text(title).font(.headline)
-                Text(detail).font(.caption).foregroundStyle(.secondary)
-            }
-            Spacer()
-        }
-        .padding(12)
-        .neonCard()
     }
 }
 

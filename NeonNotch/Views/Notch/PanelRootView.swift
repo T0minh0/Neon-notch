@@ -294,7 +294,7 @@ private struct ExpandedPanelView: View {
         case .agents:
             VStack(spacing: 10) {
                 ForEach(model.panelAgents) { agent in
-                    AgentRowView(agent: agent) { model.open(agent) }
+                    AgentRowView(agent: agent, isSelected: model.selectedAgentID == agent.id) { model.open(agent) }
                 }
                 if model.panelAgents.isEmpty {
                     EmptyAgentsView()

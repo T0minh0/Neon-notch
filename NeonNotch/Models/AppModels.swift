@@ -106,10 +106,42 @@ struct AgentSnapshot: Identifiable, Codable, Hashable, Sendable {
     var duration: TimeInterval { elapsed }
 }
 
-struct AgentHookEvent: Codable, Sendable {
+enum ProviderReadinessState: String, Codable, CaseIterable, Sendable {
+    case setupRequired
+    case awaitingTrust
+    case ready
+    case degraded
+    case unavailable
+}
+
+struct ProviderReadiness: Codable, Equatable, Sendable {
+    var state: ProviderReadinessState
+    var isAvailable: Bool
+    var detectedVersion: String?
+    var isConfigured: Bool
+    var isTrusted: Bool?
+    var lastActivity: Date?
+    var detail: String
+
+    static func unavailable(_ detail: String) -> ProviderReadiness {
+        ProviderReadiness(
+            state: .unavailable,
+            isAvailable: false,
+            detectedVersion: nil,
+            isConfigured: false,
+            isTrusted: nil,
+            lastActivity: nil,
+            detail: detail
+        )
+    }
+}
+
+struct AgentHookEvent: Codable, Equatable, Sendable {
     var schemaVersion: Int
+    var eventID: String
     var source: AgentSource
     var event: String
+    var notificationSubtype: String?
     var sessionID: String
     var agentID: String?
     var parentAgentID: String?
@@ -117,6 +149,148 @@ struct AgentHookEvent: Codable, Sendable {
     var timestamp: Date
     var title: String?
     var summary: String?
+
+    init(
+        schemaVersion: Int = 2,
+        eventID: String = UUID().uuidString,
+        source: AgentSource,
+        event: String,
+        notificationSubtype: String? = nil,
+        sessionID: String,
+        agentID: String? = nil,
+        parentAgentID: String? = nil,
+        workingDirectory: String? = nil,
+        timestamp: Date,
+        title: String? = nil,
+        summary: String? = nil
+    ) {
+        self.schemaVersion = schemaVersion
+        self.eventID = eventID
+        self.source = source
+        self.event = event
+        self.notificationSubtype = notificationSubtype
+        self.sessionID = sessionID
+        self.agentID = agentID
+        self.parentAgentID = parentAgentID
+        self.workingDirectory = workingDirectory
+        self.timestamp = timestamp
+        self.title = title?.sanitizedSummary
+        self.summary = summary?.sanitizedSummary
+    }
+
+    init(from decoder: Decoder) throws {
+        let values = try decoder.container(keyedBy: CodingKeys.self)
+        schemaVersion = try values.decodeIfPresent(Int.self, forKey: .schemaVersion) ?? 1
+        source = try values.decode(AgentSource.self, forKey: .source)
+        event = try values.decode(String.self, forKey: .event)
+        notificationSubtype = try values.decodeIfPresent(String.self, forKey: .notificationSubtype)
+        sessionID = try values.decode(String.self, forKey: .sessionID)
+        agentID = try values.decodeIfPresent(String.self, forKey: .agentID)
+        parentAgentID = try values.decodeIfPresent(String.self, forKey: .parentAgentID)
+        workingDirectory = try values.decodeIfPresent(String.self, forKey: .workingDirectory)
+        timestamp = try values.decode(Date.self, forKey: .timestamp)
+        title = try values.decodeIfPresent(String.self, forKey: .title)?.sanitizedSummary
+        summary = try values.decodeIfPresent(String.self, forKey: .summary)?.sanitizedSummary
+        eventID = try values.decodeIfPresent(String.self, forKey: .eventID)
+            ?? Self.legacyIdentifier(
+                source: source,
+                event: event,
+                sessionID: sessionID,
+                agentID: agentID,
+                timestamp: timestamp
+            )
+    }
+
+    private static func legacyIdentifier(
+        source: AgentSource,
+        event: String,
+        sessionID: String,
+        agentID: String?,
+        timestamp: Date
+    ) -> String {
+        let seed = [
+            source.rawValue,
+            event,
+            sessionID,
+            agentID ?? "",
+            String(timestamp.timeIntervalSince1970)
+        ].joined(separator: "|")
+        return "legacy-\(seed.contentHash)"
+    }
+}
+
+enum AgentStateReducer {
+    private static let attentionSubtypes: Set<String> = [
+        "permission_prompt", "idle_prompt", "input_needed", "approval_requested",
+        "elicitation", "user_input_required"
+    ]
+
+    static func status(for event: AgentHookEvent) -> AgentStatus {
+        switch event.event.lowercased() {
+        case "permissionrequest", "inputneeded", "approval-requested":
+            return .needsAttention
+        case "notification":
+            guard let subtype = event.notificationSubtype?.lowercased() else { return .unknown }
+            return attentionSubtypes.contains(subtype) ? .needsAttention : .unknown
+        case "stop", "subagentstop", "sessionend", "agent-turn-complete":
+            return .completed
+        case "sessionstart", "subagentstart", "userpromptsubmit", "task_started":
+            return .working
+        default:
+            return .unknown
+        }
+    }
+}
+
+enum GlobalShortcutTarget: String, Codable, CaseIterable, Identifiable, Sendable {
+    case lastSection
+    case agents
+    case clipboard
+
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .lastSection: "Última seção"
+        case .agents: "Agentes"
+        case .clipboard: "Clipboard"
+        }
+    }
+}
+
+struct GlobalShortcutModifiers: OptionSet, Codable, Hashable, Sendable {
+    let rawValue: UInt32
+
+    static let control = GlobalShortcutModifiers(rawValue: 1 << 0)
+    static let option = GlobalShortcutModifiers(rawValue: 1 << 1)
+    static let shift = GlobalShortcutModifiers(rawValue: 1 << 2)
+    static let command = GlobalShortcutModifiers(rawValue: 1 << 3)
+}
+
+struct GlobalShortcutConfiguration: Codable, Equatable, Sendable {
+    var keyCode: UInt32
+    var modifiers: GlobalShortcutModifiers
+    var label: String
+    var target: GlobalShortcutTarget
+
+    static let `default` = GlobalShortcutConfiguration(
+        keyCode: 49,
+        modifiers: [.control, .option],
+        label: "⌃⌥Space",
+        target: .lastSection
+    )
+}
+
+enum OnboardingStep: Int, Codable, CaseIterable, Identifiable, Sendable {
+    case installation
+    case helper
+    case providers
+    case notifications
+    case automation
+    case launchAtLogin
+    case summary
+
+    var id: Int { rawValue }
 }
 
 enum PlaybackState: String, Codable, Sendable {
@@ -252,6 +426,7 @@ enum ControlCenterSection: String, CaseIterable, Identifiable {
 
 @MainActor
 protocol AgentProvider: AnyObject {
+    var readiness: [AgentSource: ProviderReadiness] { get }
     func snapshots() async -> [AgentSnapshot]
     func open(_ snapshot: AgentSnapshot)
 }

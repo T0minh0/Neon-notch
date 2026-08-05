@@ -9,6 +9,8 @@ enum AppPaths {
     }
 
     static var eventLog: URL { supportDirectory.appendingPathComponent("agent-events.jsonl") }
+    static var agentSnapshots: URL { supportDirectory.appendingPathComponent("agent-snapshots.json") }
+    static var agentEventReceipts: URL { supportDirectory.appendingPathComponent("agent-event-receipts.json") }
     static var clipboardStore: URL { supportDirectory.appendingPathComponent("clipboard.json") }
     static var helperDirectory: URL { supportDirectory.appendingPathComponent("bin", isDirectory: true) }
     static var helperURL: URL { helperDirectory.appendingPathComponent("NeonNotchHook") }
