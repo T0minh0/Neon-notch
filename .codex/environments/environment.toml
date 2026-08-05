@@ -1,0 +1,12 @@
+name = "Neon Notch"
+
+[setup]
+command = "chmod +x script/build_and_run.sh"
+
+[actions.build]
+name = "Build"
+command = "./script/build_and_run.sh --build-only"
+
+[actions.run]
+name = "Build & Run"
+command = "./script/build_and_run.sh"

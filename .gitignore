@@ -1,0 +1,7 @@
+.DS_Store
+.build/
+DerivedData/
+xcuserdata/
+*.xcuserstate
+Design/implementation-*.png
+Design/design-qa-comparison.png

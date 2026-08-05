@@ -1,0 +1,268 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		B001 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F001 /* AppDelegate.swift */; };
+		B002 /* NeonNotchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F002 /* NeonNotchApp.swift */; };
+		B003 /* NeonTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = F003 /* NeonTheme.swift */; };
+		B004 /* AppModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = F004 /* AppModels.swift */; };
+		B005 /* AgentMonitorService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F005 /* AgentMonitorService.swift */; };
+		B006 /* ClipboardService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F006 /* ClipboardService.swift */; };
+		B007 /* HookIntegrationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F007 /* HookIntegrationManager.swift */; };
+		B008 /* LaunchAtLoginService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F008 /* LaunchAtLoginService.swift */; };
+		B009 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F009 /* NotificationService.swift */; };
+		B010 /* SessionOpeningService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F010 /* SessionOpeningService.swift */; };
+		B011 /* SpotifyService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F011 /* SpotifyService.swift */; };
+		B012 /* SystemMetricsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F012 /* SystemMetricsService.swift */; };
+		B013 /* AppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F013 /* AppModel.swift */; };
+		B014 /* Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = F014 /* Utilities.swift */; };
+		B015 /* ControlCenterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F015 /* ControlCenterView.swift */; };
+		B016 /* AgentRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F016 /* AgentRowView.swift */; };
+		B017 /* MediaFooterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F017 /* MediaFooterView.swift */; };
+		B018 /* MetricsStripView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F018 /* MetricsStripView.swift */; };
+		B019 /* NotchPanelController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F019 /* NotchPanelController.swift */; };
+		B020 /* PanelRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F020 /* PanelRootView.swift */; };
+		B021 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F021 /* SettingsView.swift */; };
+		B022 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = F022 /* main.swift */; };
+		B023 /* NeonNotchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F023 /* NeonNotchTests.swift */; };
+		B024 /* demo-album-art.png in Resources */ = {isa = PBXBuildFile; fileRef = F026 /* demo-album-art.png */; };
+		B025 /* ExpandedClipboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F027 /* ExpandedClipboardView.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		C001 = {
+			isa = PBXContainerItemProxy;
+			containerPortal = P001 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = T001;
+			remoteInfo = NeonNotch;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		F001 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = App/AppDelegate.swift; sourceTree = "<group>"; };
+		F002 /* NeonNotchApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = App/NeonNotchApp.swift; sourceTree = "<group>"; };
+		F003 /* NeonTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesignSystem/NeonTheme.swift; sourceTree = "<group>"; };
+		F004 /* AppModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models/AppModels.swift; sourceTree = "<group>"; };
+		F005 /* AgentMonitorService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/AgentMonitorService.swift; sourceTree = "<group>"; };
+		F006 /* ClipboardService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/ClipboardService.swift; sourceTree = "<group>"; };
+		F007 /* HookIntegrationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/HookIntegrationManager.swift; sourceTree = "<group>"; };
+		F008 /* LaunchAtLoginService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/LaunchAtLoginService.swift; sourceTree = "<group>"; };
+		F009 /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/NotificationService.swift; sourceTree = "<group>"; };
+		F010 /* SessionOpeningService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/SessionOpeningService.swift; sourceTree = "<group>"; };
+		F011 /* SpotifyService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/SpotifyService.swift; sourceTree = "<group>"; };
+		F012 /* SystemMetricsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/SystemMetricsService.swift; sourceTree = "<group>"; };
+		F013 /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Stores/AppModel.swift; sourceTree = "<group>"; };
+		F014 /* Utilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Support/Utilities.swift; sourceTree = "<group>"; };
+		F015 /* ControlCenterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/ControlCenter/ControlCenterView.swift; sourceTree = "<group>"; };
+		F016 /* AgentRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Notch/AgentRowView.swift; sourceTree = "<group>"; };
+		F017 /* MediaFooterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Notch/MediaFooterView.swift; sourceTree = "<group>"; };
+		F018 /* MetricsStripView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Notch/MetricsStripView.swift; sourceTree = "<group>"; };
+		F019 /* NotchPanelController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Notch/NotchPanelController.swift; sourceTree = "<group>"; };
+		F020 /* PanelRootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Notch/PanelRootView.swift; sourceTree = "<group>"; };
+		F021 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Settings/SettingsView.swift; sourceTree = "<group>"; };
+		F022 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
+		F023 /* NeonNotchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NeonNotchTests.swift; sourceTree = "<group>"; };
+		F024 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		F025 /* NeonNotch.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = NeonNotch.entitlements; sourceTree = "<group>"; };
+		F026 /* demo-album-art.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Resources/demo-album-art.png; sourceTree = "<group>"; };
+		F027 /* ExpandedClipboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Notch/ExpandedClipboardView.swift; sourceTree = "<group>"; };
+		PR001 /* Neon Notch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Neon Notch.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		PR002 /* NeonNotchHook */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = NeonNotchHook; sourceTree = BUILT_PRODUCTS_DIR; };
+		PR003 /* NeonNotchTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NeonNotchTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		PHF001 = {isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
+		PHF002 = {isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
+		PHF003 = {isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		G001 = {
+			isa = PBXGroup;
+			children = (G002, G003, G004, G005);
+			sourceTree = "<group>";
+		};
+		G002 /* NeonNotch */ = {
+			isa = PBXGroup;
+			children = (F001, F002, F003, F004, F005, F006, F007, F008, F009, F010, F011, F012, F013, F014, F015, F016, F017, F018, F019, F020, F021, F024, F025, F026, F027);
+			path = NeonNotch;
+			sourceTree = "<group>";
+		};
+		G003 /* NeonNotchHook */ = {isa = PBXGroup; children = (F022); path = NeonNotchHook; sourceTree = "<group>"; };
+		G004 /* NeonNotchTests */ = {isa = PBXGroup; children = (F023); path = NeonNotchTests; sourceTree = "<group>"; };
+		G005 /* Products */ = {isa = PBXGroup; children = (PR001, PR002, PR003); name = Products; sourceTree = "<group>"; };
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		T001 /* NeonNotch */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CL002;
+			buildPhases = (PHS001, PHF001, PHR001);
+			buildRules = ();
+			dependencies = ();
+			name = NeonNotch;
+			productName = NeonNotch;
+			productReference = PR001;
+			productType = "com.apple.product-type.application";
+		};
+		T002 /* NeonNotchHook */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CL003;
+			buildPhases = (PHS002, PHF002);
+			buildRules = ();
+			dependencies = ();
+			name = NeonNotchHook;
+			productName = NeonNotchHook;
+			productReference = PR002;
+			productType = "com.apple.product-type.tool";
+		};
+		T003 /* NeonNotchTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CL004;
+			buildPhases = (PHS003, PHF003, PHR003);
+			buildRules = ();
+			dependencies = (D001);
+			name = NeonNotchTests;
+			productName = NeonNotchTests;
+			productReference = PR003;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		P001 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 2660;
+				LastUpgradeCheck = 2660;
+				TargetAttributes = {
+					T001 = {CreatedOnToolsVersion = 26.6; };
+					T002 = {CreatedOnToolsVersion = 26.6; };
+					T003 = {CreatedOnToolsVersion = 26.6; TestTargetID = T001; };
+				};
+			};
+			buildConfigurationList = CL001;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (en, Base);
+			mainGroup = G001;
+			productRefGroup = G005;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (T001, T002, T003);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		PHR001 = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (B024); runOnlyForDeploymentPostprocessing = 0; };
+		PHR003 = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		PHS001 = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (B001, B002, B003, B004, B005, B006, B007, B008, B009, B010, B011, B012, B013, B014, B015, B016, B017, B018, B019, B020, B021, B025);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		PHS002 = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (B022); runOnlyForDeploymentPostprocessing = 0; };
+		PHS003 = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (B023); runOnlyForDeploymentPostprocessing = 0; };
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		D001 = {isa = PBXTargetDependency; target = T001; targetProxy = C001; };
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		CFG001 = {isa = XCBuildConfiguration; buildSettings = {CLANG_ENABLE_MODULES = YES; MACOSX_DEPLOYMENT_TARGET = 26.0; SDKROOT = macosx; SWIFT_VERSION = 6.0; }; name = Debug; };
+		CFG002 = {isa = XCBuildConfiguration; buildSettings = {CLANG_ENABLE_MODULES = YES; MACOSX_DEPLOYMENT_TARGET = 26.0; SDKROOT = macosx; SWIFT_COMPILATION_MODE = wholemodule; SWIFT_VERSION = 6.0; }; name = Release; };
+		CFG003 = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = NeonNotch/NeonNotch.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = NeonNotch/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				MARKETING_VERSION = 0.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.cammis.NeonNotch;
+				PRODUCT_MODULE_NAME = NeonNotch;
+				PRODUCT_NAME = "Neon Notch";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_STRICT_CONCURRENCY = minimal;
+			};
+			name = Debug;
+		};
+		CFG004 = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = NeonNotch/NeonNotch.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = NeonNotch/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				MARKETING_VERSION = 0.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.cammis.NeonNotch;
+				PRODUCT_MODULE_NAME = NeonNotch;
+				PRODUCT_NAME = "Neon Notch";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_STRICT_CONCURRENCY = minimal;
+			};
+			name = Release;
+		};
+		CFG005 = {isa = XCBuildConfiguration; buildSettings = {CODE_SIGNING_ALLOWED = NO; GENERATE_INFOPLIST_FILE = YES; PRODUCT_NAME = NeonNotchHook; SWIFT_STRICT_CONCURRENCY = minimal; }; name = Debug; };
+		CFG006 = {isa = XCBuildConfiguration; buildSettings = {CODE_SIGNING_ALLOWED = NO; GENERATE_INFOPLIST_FILE = YES; PRODUCT_NAME = NeonNotchHook; SWIFT_STRICT_CONCURRENCY = minimal; }; name = Release; };
+		CFG007 = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGNING_ALLOWED = NO;
+				GENERATE_INFOPLIST_FILE = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.cammis.NeonNotchTests;
+				PRODUCT_MODULE_NAME = NeonNotchTests;
+				PRODUCT_NAME = NeonNotchTests;
+				SWIFT_STRICT_CONCURRENCY = minimal;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Neon Notch.app/Contents/MacOS/Neon Notch";
+			};
+			name = Debug;
+		};
+		CFG008 = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGNING_ALLOWED = NO;
+				GENERATE_INFOPLIST_FILE = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.cammis.NeonNotchTests;
+				PRODUCT_MODULE_NAME = NeonNotchTests;
+				PRODUCT_NAME = NeonNotchTests;
+				SWIFT_STRICT_CONCURRENCY = minimal;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Neon Notch.app/Contents/MacOS/Neon Notch";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		CL001 = {isa = XCConfigurationList; buildConfigurations = (CFG001, CFG002); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
+		CL002 = {isa = XCConfigurationList; buildConfigurations = (CFG003, CFG004); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
+		CL003 = {isa = XCConfigurationList; buildConfigurations = (CFG005, CFG006); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
+		CL004 = {isa = XCConfigurationList; buildConfigurations = (CFG007, CFG008); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
+/* End XCConfigurationList section */
+	};
+	rootObject = P001 /* Project object */;
+}
