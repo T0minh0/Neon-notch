@@ -33,12 +33,12 @@ final class NotchPanelController {
         renderingState = NotchRenderingState(renderedState: model.panelState)
         panel = NeonPanel(
             contentRect: .zero,
-            styleMask: [.borderless, .nonactivatingPanel, .fullSizeContentView],
+            styleMask: NeonPanel.interactiveStyleMask,
             backing: .buffered,
             defer: false
         )
         configurePanel()
-        let hostingView = NSHostingView(
+        let hostingView = InteractiveHostingView(
             rootView: PanelRootView(
                 model: model,
                 geometry: geometry,
@@ -83,16 +83,21 @@ final class NotchPanelController {
     }
 
     private func configurePanel() {
-        panel.level = .statusBar
+        panel.applyNotchOverlayPolicy()
         panel.isOpaque = false
         panel.backgroundColor = .clear
         panel.hasShadow = false
         panel.hidesOnDeactivate = false
         panel.isMovable = false
+        panel.ignoresMouseEvents = false
         panel.acceptsMouseMovedEvents = true
-        panel.becomesKeyOnlyIfNeeded = true
-        panel.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary, .stationary, .ignoresCycle]
+        panel.becomesKeyOnlyIfNeeded = false
         panel.animationBehavior = .none
+        panel.prepareForMouseInteraction = { [weak self] in
+            guard let self else { return }
+            NSApp.activate(ignoringOtherApps: true)
+            self.panel.makeKeyAndOrderFront(nil)
+        }
     }
 
     private func installEventMonitors() {
@@ -115,6 +120,11 @@ final class NotchPanelController {
 
     private func transition(to targetState: PanelPresentationState) {
         transitionTask?.cancel()
+
+        if targetState == .expanded {
+            NSApp.activate(ignoringOtherApps: true)
+            panel.makeKeyAndOrderFront(nil)
+        }
 
         if targetState == .collapsed {
             withAnimation(.easeOut(duration: NotchPanelMetrics.collapseDuration)) {
@@ -203,7 +213,41 @@ final class NotchPanelController {
 
 }
 
-private final class NeonPanel: NSPanel {
+final class NeonPanel: NSPanel {
+    static let interactiveStyleMask: NSWindow.StyleMask = [
+        .borderless,
+        .nonactivatingPanel,
+        .fullSizeContentView
+    ]
+    static let overlayWindowLevel = NSWindow.Level.screenSaver
+    static let crossApplicationCollectionBehavior: NSWindow.CollectionBehavior = [
+        .canJoinAllSpaces,
+        .canJoinAllApplications,
+        .fullScreenAuxiliary,
+        .stationary,
+        .ignoresCycle
+    ]
+
+    var prepareForMouseInteraction: (() -> Void)?
+
     override var canBecomeKey: Bool { true }
     override var canBecomeMain: Bool { false }
+
+    func applyNotchOverlayPolicy() {
+        isFloatingPanel = true
+        collectionBehavior = Self.crossApplicationCollectionBehavior
+        level = Self.overlayWindowLevel
+    }
+
+    override func sendEvent(_ event: NSEvent) {
+        if event.type == .leftMouseDown || event.type == .rightMouseDown {
+            prepareForMouseInteraction?()
+        }
+        super.sendEvent(event)
+    }
+}
+
+final class InteractiveHostingView<Content: View>: NSHostingView<Content> {
+    override func acceptsFirstMouse(for event: NSEvent?) -> Bool { true }
+    override var needsPanelToBecomeKey: Bool { true }
 }

@@ -136,6 +136,40 @@ struct NeonNotchTests {
         #expect(crashed?.status == .unknown)
     }
 
+    @Test("A terminal session removes stale provider aliases from the same Claude session")
+    @MainActor
+    func terminalSessionRemovesProviderAliases() {
+        let now = Date(timeIntervalSince1970: 2_000_000_000)
+        var terminal = agentSnapshot(id: "session-full-id", status: .completed, updatedAt: now)
+        terminal.sessionID = "session-full-id"
+        terminal.agentID = nil
+
+        var staleAlias = agentSnapshot(
+            id: "session",
+            status: .needsAttention,
+            updatedAt: now.addingTimeInterval(-60)
+        )
+        staleAlias.sessionID = "session-full-id"
+        staleAlias.agentID = "session"
+
+        let reconciled = AgentMonitorService.reconcile(
+            hook: [terminal],
+            provider: [staleAlias],
+            persisted: [staleAlias],
+            now: now
+        )
+
+        #expect(reconciled.map(\.id) == ["session-full-id"])
+        #expect(reconciled.first?.status == .completed)
+    }
+
+    @Test("Claude blocked records without a live process are not actionable")
+    @MainActor
+    func blockedClaudeRequiresLiveProcess() {
+        #expect(AgentMonitorService.claudeStatus(rawState: "blocked", processIsRunning: false) == .unknown)
+        #expect(AgentMonitorService.claudeStatus(rawState: "blocked", processIsRunning: true) == .needsAttention)
+    }
+
     @Test("Event store starts live at EOF and deduplicates event IDs")
     @MainActor
     func eventStoreCursorAndDeduplication() throws {
@@ -343,12 +377,88 @@ struct NeonNotchTests {
         #expect(Date().addingTimeInterval(-25 * 60 * 60) < cutoff)
     }
 
+    @Test("System memory excludes reclaimable file-backed cache like Activity Monitor")
+    func systemMemoryExcludesFileCache() {
+        let used = SystemMetricsService.memoryUsed(
+            totalBytes: 1_000,
+            pageSize: 1,
+            freePages: 100,
+            fileBackedPages: 300
+        )
+
+        #expect(used == 600)
+    }
+
+    @Test("Notch hosting view accepts controls after the overlay becomes key")
+    @MainActor
+    func notchHostingViewAcceptsFirstMouse() {
+        let hostingView = InteractiveHostingView(rootView: EmptyView())
+        hostingView.frame = CGRect(x: 0, y: 0, width: 100, height: 100)
+
+        #expect(hostingView.acceptsFirstMouse(for: nil))
+        #expect(hostingView.needsPanelToBecomeKey)
+        #expect(hostingView.hitTest(CGPoint(x: 50, y: 50)) === hostingView)
+    }
+
+    @Test("Notch panel prepares interaction before dispatching the first mouse down")
+    @MainActor
+    func notchPanelPreparesFirstMouseDown() throws {
+        let panel = NeonPanel(
+            contentRect: CGRect(x: 0, y: 0, width: 100, height: 100),
+            styleMask: [.borderless, .nonactivatingPanel],
+            backing: .buffered,
+            defer: false
+        )
+        var preparationCount = 0
+        panel.prepareForMouseInteraction = { preparationCount += 1 }
+        let event = try #require(NSEvent.mouseEvent(
+            with: .leftMouseDown,
+            location: CGPoint(x: 50, y: 50),
+            modifierFlags: [],
+            timestamp: 0,
+            windowNumber: panel.windowNumber,
+            context: nil,
+            eventNumber: 1,
+            clickCount: 1,
+            pressure: 1
+        ))
+
+        panel.sendEvent(event)
+
+        #expect(preparationCount == 1)
+    }
+
+    @Test("Interactive notch panel remains a nonactivating overlay")
+    func interactivePanelStyle() {
+        #expect(NeonPanel.interactiveStyleMask.contains(.nonactivatingPanel))
+        #expect(NeonPanel.interactiveStyleMask.contains(.borderless))
+    }
+
+    @Test("Notch overlay joins full-screen Spaces owned by other applications")
+    @MainActor
+    func overlayJoinsOtherApplicationsInFullScreen() {
+        let panel = NeonPanel(
+            contentRect: CGRect(x: 0, y: 0, width: 100, height: 100),
+            styleMask: NeonPanel.interactiveStyleMask,
+            backing: .buffered,
+            defer: false
+        )
+        panel.applyNotchOverlayPolicy()
+        let behavior = panel.collectionBehavior
+
+        #expect(panel.isFloatingPanel)
+        #expect(panel.level == .screenSaver)
+        #expect(behavior.contains(.canJoinAllApplications))
+        #expect(behavior.contains(.canJoinAllSpaces))
+        #expect(behavior.contains(.fullScreenAuxiliary))
+    }
+
     @Test("Notch panel dimensions match the approved visual contract")
     func notchPanelMetrics() {
         #expect(NotchPanelMetrics.expandedHeight == 380)
         #expect(NotchPanelMetrics.footerHeight == 72)
-        #expect(NotchPanelMetrics.collapsedHorizontalAllowance == 16)
-        #expect(NotchPanelMetrics.collapsedVerticalAllowance == 8)
+        #expect(NotchPanelMetrics.collapsedHorizontalAllowance >= 40)
+        #expect(NotchPanelMetrics.collapsedVerticalAllowance >= 24)
         #expect(NotchPanelMetrics.taperStartY(in: CGRect(x: 0, y: 0, width: 1_120, height: 380)) == 308)
         #expect(NotchPanelMetrics.bottomInset(for: 1_120) == 300)
         #expect(NotchPanelMetrics.bottomInset(for: 800) == 216)

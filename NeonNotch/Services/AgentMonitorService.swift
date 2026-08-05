@@ -1,4 +1,5 @@
 import AppKit
+import Darwin
 import Foundation
 
 @MainActor
@@ -109,9 +110,21 @@ final class AgentMonitorService: AgentProvider {
         let providerByID = Dictionary(provider.map { ($0.id, $0) }, uniquingKeysWith: newest)
         let persistedByID = Dictionary(persisted.map { ($0.id, $0) }, uniquingKeysWith: newest)
         let identifiers = Set(hookByID.keys).union(providerByID.keys).union(persistedByID.keys)
+        let terminalBySessionID = Dictionary(
+            hookByID.values
+                .filter { $0.status == .completed && $0.agentID == nil }
+                .map { ($0.sessionID, $0) },
+            uniquingKeysWith: newest
+        )
         let cutoff = now.addingTimeInterval(-86_400)
 
         return identifiers.compactMap { id -> AgentSnapshot? in
+            let candidate = hookByID[id] ?? providerByID[id] ?? persistedByID[id]
+            if let candidate,
+               let terminal = terminalBySessionID[candidate.sessionID],
+               candidate.id != terminal.id {
+                return nil
+            }
             if var live = hookByID[id] {
                 let providerIsActive = providerByID[id].map {
                     $0.status == .working || $0.status == .needsAttention
@@ -238,14 +251,8 @@ final class AgentMonitorService: AgentProvider {
             let cwd = item["cwd"] as? String ?? ""
             let rawState = (item["state"] as? String)?.lowercased()
             let processIdentifier = (item["pid"] as? Int) ?? (item["pid"] as? String).flatMap(Int.init)
-            let processIsPresent = processIdentifier.map { $0 > 0 } ?? false
-            let status: AgentStatus = switch rawState {
-            case "blocked": .needsAttention
-            case "completed", "done", "stopped", "finished": .completed
-            case "running", "active": processIsPresent ? .working : .unknown
-            case "failed": .unknown
-            default: processIsPresent ? .working : .unknown
-            }
+            let processIsRunning = processIdentifier.map(Self.isProcessRunning) ?? false
+            let status = Self.claudeStatus(rawState: rawState, processIsRunning: processIsRunning)
             let startedAt = Self.flexibleDate(item["startedAt"]) ?? now.addingTimeInterval(-120)
             guard startedAt >= now.addingTimeInterval(-86_400) || status == .working || status == .needsAttention else { return nil }
             let project = URL(fileURLWithPath: cwd).lastPathComponent
@@ -273,6 +280,22 @@ final class AgentMonitorService: AgentProvider {
             detail: "Provider claude agents disponível."
         )
         return snapshots
+    }
+
+    static func claudeStatus(rawState: String?, processIsRunning: Bool) -> AgentStatus {
+        switch rawState?.lowercased() {
+        case "blocked": processIsRunning ? .needsAttention : .unknown
+        case "completed", "done", "stopped", "finished": .completed
+        case "running", "active": processIsRunning ? .working : .unknown
+        case "failed": .unknown
+        default: processIsRunning ? .working : .unknown
+        }
+    }
+
+    private nonisolated static func isProcessRunning(_ identifier: Int) -> Bool {
+        guard identifier > 0 else { return false }
+        if kill(pid_t(identifier), 0) == 0 { return true }
+        return errno == EPERM
     }
 
     private func detectVersions() async {

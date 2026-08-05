@@ -27,8 +27,8 @@ enum NeonTheme {
 enum NotchPanelMetrics {
     static let expandedHeight: CGFloat = 380
     static let footerHeight: CGFloat = 72
-    static let collapsedHorizontalAllowance: CGFloat = 16
-    static let collapsedVerticalAllowance: CGFloat = 8
+    static let collapsedHorizontalAllowance: CGFloat = 40
+    static let collapsedVerticalAllowance: CGFloat = 24
     static let revealDuration: TimeInterval = 0.18
     static let collapseDuration: TimeInterval = 0.16
 
