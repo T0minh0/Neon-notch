@@ -5,10 +5,10 @@
 From the repository root, run:
 
 ```bash
-./script/build_and_run.sh
+./script/build_and_run.sh --build-only
 ```
 
-This builds the app and `NeonNotchHook`, embeds the helper in the Debug app bundle, and opens `DerivedData/Build/Products/Debug/Neon Notch.app`. Use `./script/build_and_run.sh --build-only` when you do not want to launch the app.
+This canonical build command builds the app and `NeonNotchHook`, embeds the helper in the Debug app bundle, and leaves the output at `DerivedData/Build/Products/Debug/Neon Notch.app`. Omit `--build-only` only when you want the script to open the Debug app after building.
 
 ## Signed personal installation
 

@@ -6,7 +6,7 @@
 
 Neon Notch is a native SwiftUI utility that turns a MacBook notch into a private, local control surface for coding agents, Spotify, system metrics, and recent clipboard items.
 
-> **Early alpha:** Neon Notch is actively evolving. Expect rough edges, changing integration behavior, and no compatibility guarantee between pre-release versions.
+> **Early alpha:** Neon Notch is actively evolving. Expect rough edges, changing integration behavior, and no compatibility guarantee between pre-release versions. The application UI currently remains Portuguese.
 
 ![Expanded Neon Notch panel](docs/assets/neon-notch-hero.png)
 
@@ -26,13 +26,13 @@ Neon Notch is a native SwiftUI utility that turns a MacBook notch into a private
 
 ## Build from source
 
-The supported Debug workflow builds the app and its `NeonNotchHook` helper without signing your personal installation:
+The canonical Debug build workflow builds the app and its `NeonNotchHook` helper without signing or launching your personal installation:
 
 ```bash
-./script/build_and_run.sh
+./script/build_and_run.sh --build-only
 ```
 
-The generated bundle is at `DerivedData/Build/Products/Debug/Neon Notch.app`. To build only, pass `--build-only`.
+The generated bundle is at `DerivedData/Build/Products/Debug/Neon Notch.app`. Omit `--build-only` only when you want the script to open the Debug app after building.
 
 For a signed personal Release install, first create the local signing identity and then run the installer:
 
@@ -56,6 +56,10 @@ Notifications and Automation are optional. If macOS denies either, use the recov
 Neon Notch stores its working data locally in Application Support. The helper records only sanitized event metadata; prompts, responses, commands, and tool arguments are not logged. Clipboard collection skips concealed and transient types and defaults to excluding common password-manager apps. Spotify artwork is cached locally.
 
 The app is not sandboxed by design because it integrates with local tools and Automation. It is not a security boundary, does not sync data, and does not guarantee that external Codex, Claude Code, Spotify, or macOS APIs will remain compatible. Read [privacy and security](docs/privacy-security.md) for details.
+
+## Architecture
+
+The SwiftUI app uses an AppKit `NSPanel` bridge for notch-adjacent presentation. A bundled `NeonNotchHook` helper receives approved Codex and Claude Code events, sanitizes them, and appends local JSONL records; local services reduce those records into panel state alongside clipboard, media, metrics, notifications, and diagnostics. See the [architecture guide](docs/architecture.md) for the component and data-flow detail.
 
 ## Project guide
 
