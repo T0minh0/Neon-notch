@@ -12,7 +12,17 @@ This canonical build command builds the app and `NeonNotchHook`, embeds the help
 
 ## Signed personal installation
 
-Neon Notch's Release installation is designed for a local, personal signing identity. Create it once:
+Neon Notch's Release installation is designed for a local, personal signing identity.
+
+### Local-signing warning
+
+Before you run the setup script, understand that it creates a self-signed code-signing certificate and its private key, valid for ten years. It imports that identity into your login keychain and adds the certificate there as a trusted root. This changes your local trust settings. The identity is only for your personal installation; it is not an Apple Developer ID certificate and does not make a distributable or notarized build.
+
+The script uses the `openssl` found on `PATH`. It feature-detects whether `openssl pkcs12` supports `-legacy`: OpenSSL 3 keeps the compatibility option, while macOS's bundled LibreSSL exports the archive without the unsupported flag.
+
+To remove the identity safely, quit Neon Notch, open **Keychain Access**, select the **login** keychain, search for `Neon Notch Local Code Signing`, and delete the certificate/identity together with its associated private key. Confirm the Keychain Access prompt. Existing builds signed by that identity will no longer be trusted; rerun the setup script only if you want to create a new identity.
+
+Read the script before using it, and do not use this identity to sign software you intend to distribute. Then create it once:
 
 ```bash
 ./script/setup_local_signing.sh
@@ -25,10 +35,6 @@ Then build, sign, verify, and install:
 ```
 
 The installer places the app at `~/Applications/Neon Notch.app` and retains the previous app at `~/Applications/Neon Notch.previous.app` after a successful replacement.
-
-### Local-signing warning
-
-The signing script creates a self-signed identity in your login keychain. It is for your local installation only; it is not an Apple Developer ID certificate and does not make a distributable or notarized build. Read the script before using it, and do not use it to sign software you intend to distribute.
 
 ## First launch
 

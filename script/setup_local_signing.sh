@@ -4,6 +4,12 @@ set -euo pipefail
 readonly IDENTITY_NAME="Neon Notch Local Code Signing"
 readonly LOGIN_KEYCHAIN="${HOME}/Library/Keychains/login.keychain-db"
 
+openssl_pkcs12_supports_legacy() {
+  local help_output
+  help_output="$(openssl pkcs12 -help 2>&1 || true)"
+  [[ "${help_output}" == *"-legacy"* ]]
+}
+
 if security find-identity -v -p codesigning "${LOGIN_KEYCHAIN}" | grep -Fq "${IDENTITY_NAME}"; then
   print -r -- "Certificate already available: ${IDENTITY_NAME}"
   exit 0
@@ -16,6 +22,11 @@ readonly CERTIFICATE_PATH="${TEMP_DIRECTORY}/neon-notch-code-signing.cer"
 readonly PRIVATE_KEY_PATH="${TEMP_DIRECTORY}/neon-notch-code-signing.key"
 readonly ARCHIVE_PATH="${TEMP_DIRECTORY}/neon-notch-code-signing.p12"
 readonly ARCHIVE_PASSWORD="$(openssl rand -hex 24)"
+typeset -a pkcs12_compatibility_options=()
+
+if openssl_pkcs12_supports_legacy; then
+  pkcs12_compatibility_options=(-legacy)
+fi
 
 openssl req \
   -newkey rsa:3072 \
@@ -31,7 +42,7 @@ openssl req \
 
 openssl pkcs12 \
   -export \
-  -legacy \
+  "${pkcs12_compatibility_options[@]}" \
   -name "${IDENTITY_NAME}" \
   -inkey "${PRIVATE_KEY_PATH}" \
   -in "${CERTIFICATE_PATH}" \

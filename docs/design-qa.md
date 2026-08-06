@@ -8,7 +8,7 @@ This document records the visual QA baseline for the notch silhouette and standb
 - [Normalized implementation comparison](../Design/design-qa-smoke-comparison.png)
 - [Expanded panel capture](assets/neon-notch-hero.png)
 
-The visual target is `1500 × 1060 px`. The expanded panel was rendered at `1120 × 380 pt` on a Retina display and captured at `2240 × 760 px` (`@2x`). The normalized comparison is `1500 × 1642 px`.
+The visual target is `1487 × 1058 px`. The expanded panel was rendered at `1120 × 380 pt` on a Retina display and captured at `2240 × 760 px` (`@2x`). The normalized comparison is `1500 × 1642 px`.
 
 ## Full-panel comparison
 

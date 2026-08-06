@@ -7,17 +7,18 @@ Neon Notch is a native macOS application built with SwiftUI, with a small AppKit
 | Component | Responsibility |
 | --- | --- |
 | `NeonNotch` | SwiftUI app, notch panel, Settings, onboarding, and local services. |
-| `NeonNotchHook` | Command-line helper that accepts hook events on standard input and appends sanitized JSONL records locally. |
+| `NeonNotchHook` | Command-line helper that accepts hook events on standard input and appends selected event metadata plus a sanitized short summary to local JSONL. |
 | `NeonNotchTests` | Tests for state reduction, sanitation, hook compatibility, retention, shortcuts, media commands, and integrations. |
 | `script/` | Canonical Debug build/run, local signing/install, and image utility workflows. |
 
 ## Data flow
 
-1. Codex or Claude Code invokes `NeonNotchHook` through a user-approved local hook.
-2. The helper sanitizes supported metadata and writes an event to the app's local JSONL queue.
+1. Codex or Claude Code invokes `NeonNotchHook` through a configured local hook. Codex requires the user to approve that hook explicitly.
+2. The helper writes selected metadata verbatim—event/subtype, session and agent identifiers, working directory, and timestamp—plus a short sanitized summary to the app's local JSONL queue.
 3. `AgentEventStore` reads, deduplicates, retains, and compacts those events.
-4. `AgentMonitorService` reduces events and provider observations into displayable agent snapshots.
-5. `AppModel` coordinates the panel, settings, notifications, clipboard, media, and diagnostics.
+4. Independently, `AgentMonitorService` starts provider observation when the non-demo app launches, even before onboarding is complete. It discovers Codex `state_*.sqlite` catalogs, queries recent rows read-only, inspects at most the final 128 KiB of referenced rollout files, and runs `claude agents --json --all`. Raw SQLite rows, rollout text, and Claude JSON are inspected in memory rather than copied; derived identifiers, paths/project information, timestamps, and status snapshots may be persisted.
+5. `AgentMonitorService` reconciles hook events, provider observations, and persisted snapshots into displayable agent state. Provider observation refreshes periodically while the app runs. Codex hook trust gates hook execution only, not provider observation.
+6. `AppModel` coordinates the panel, settings, notifications, clipboard, media, and diagnostics.
 
 ## Local state
 

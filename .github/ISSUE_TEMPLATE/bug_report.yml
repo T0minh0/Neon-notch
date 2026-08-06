@@ -14,7 +14,10 @@ body:
     attributes:
       label: What happened?
       description: Describe the actual behavior and what you expected instead.
-      placeholder: Actual behavior...\n\nExpected behavior...
+      placeholder: |
+        Actual behavior...
+
+        Expected behavior...
     validations:
       required: true
   - type: textarea
