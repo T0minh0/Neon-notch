@@ -2,10 +2,10 @@
 
 ## Supported versions
 
-Security fixes are applied to the latest development version. Early-alpha releases may change without backports.
+Only the current `main` branch is supported with security fixes. Early-alpha releases may change without backports.
 
 ## Reporting a vulnerability
 
-Please do not open a public issue for a suspected vulnerability. Use GitHub's private vulnerability reporting for this repository, or contact the repository owner through GitHub with a concise report, affected revision, impact, and safe reproduction steps.
+Please do not open a public issue for a suspected vulnerability. Use [GitHub private vulnerability reporting](https://github.com/T0minh0/Neon-notch/security/advisories/new) for this repository with a concise report, affected revision, impact, and safe reproduction steps.
 
-Avoid including credentials, personal agent data, or clipboard contents. You can expect an acknowledgement after the report is reviewed; fixes and disclosure timing depend on severity and reproducibility.
+Avoid including credentials, personal agent data, or clipboard contents. There is no guaranteed response time; fixes and disclosure timing depend on severity and reproducibility.

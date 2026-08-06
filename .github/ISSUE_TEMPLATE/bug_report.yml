@@ -1,0 +1,56 @@
+name: Bug report
+description: Report reproducible unexpected behavior in Neon Notch.
+title: "[Bug]: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a bug. Do not include credentials, agent transcripts,
+        clipboard contents, or other sensitive desktop information.
+  - type: textarea
+    id: description
+    attributes:
+      label: What happened?
+      description: Describe the actual behavior and what you expected instead.
+      placeholder: Actual behavior...\n\nExpected behavior...
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Safe reproduction steps
+      description: Provide the smallest safe set of steps that reproduces the problem.
+      placeholder: |
+        1. ...
+        2. ...
+        3. ...
+    validations:
+      required: true
+  - type: input
+    id: macos
+    attributes:
+      label: macOS version
+      placeholder: macOS 26.0
+    validations:
+      required: true
+  - type: input
+    id: app-version
+    attributes:
+      label: Neon Notch version or commit
+      placeholder: Commit SHA or app version
+    validations:
+      required: true
+  - type: input
+    id: xcode
+    attributes:
+      label: Xcode version
+      placeholder: Xcode 26.6
+    validations:
+      required: true
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional context
+      description: Add safe logs, screenshots, or other relevant context if available.
