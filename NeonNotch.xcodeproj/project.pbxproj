@@ -35,6 +35,7 @@
 		B027 /* GlobalHotKeyService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F029 /* GlobalHotKeyService.swift */; };
 		B028 /* PermissionDiagnosticsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F030 /* PermissionDiagnosticsService.swift */; };
 		B029 /* DailyDriverViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = F031 /* DailyDriverViews.swift */; };
+		B030 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F032 /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -79,6 +80,7 @@
 		F029 /* GlobalHotKeyService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/GlobalHotKeyService.swift; sourceTree = "<group>"; };
 		F030 /* PermissionDiagnosticsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/PermissionDiagnosticsService.swift; sourceTree = "<group>"; };
 		F031 /* DailyDriverViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Settings/DailyDriverViews.swift; sourceTree = "<group>"; };
+		F032 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		PR001 /* Neon Notch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Neon Notch.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		PR002 /* NeonNotchHook */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = NeonNotchHook; sourceTree = BUILT_PRODUCTS_DIR; };
 		PR003 /* NeonNotchTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NeonNotchTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -98,7 +100,7 @@
 		};
 		G002 /* NeonNotch */ = {
 			isa = PBXGroup;
-			children = (F001, F002, F003, F004, F005, F006, F007, F008, F009, F010, F011, F012, F013, F014, F015, F016, F017, F018, F019, F020, F021, F024, F025, F026, F027, F028, F029, F030, F031);
+			children = (F001, F002, F003, F004, F005, F006, F007, F008, F009, F010, F011, F012, F013, F014, F015, F016, F017, F018, F019, F020, F021, F024, F025, F026, F027, F028, F029, F030, F031, F032);
 			path = NeonNotch;
 			sourceTree = "<group>";
 		};
@@ -170,7 +172,7 @@
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		PHR001 = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (B024); runOnlyForDeploymentPostprocessing = 0; };
+		PHR001 = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (B024, B030); runOnlyForDeploymentPostprocessing = 0; };
 		PHR003 = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
 /* End PBXResourcesBuildPhase section */
 
@@ -195,6 +197,7 @@
 		CFG003 = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = NeonNotch/NeonNotch.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 2;
@@ -216,6 +219,7 @@
 		CFG004 = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = NeonNotch/NeonNotch.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 2;
