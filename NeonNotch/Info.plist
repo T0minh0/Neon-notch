@@ -25,7 +25,7 @@
     <key>NSAppleEventsUsageDescription</key>
     <string>Neon Notch usa Automação para controlar o Spotify e reabrir sessões do Claude Code no Terminal.</string>
     <key>NSHumanReadableCopyright</key>
-    <string>Personal utility</string>
+    <string>Copyright (c) 2026 T0minh0. Licensed under the MIT License.</string>
     <key>NSPrincipalClass</key>
     <string>NSApplication</string>
     <key>NSUserNotificationAlertStyle</key>

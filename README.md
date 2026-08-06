@@ -1,47 +1,78 @@
 # Neon Notch
 
-App nativo para macOS 26+ que transforma o notch do MacBook em um painel local para agentes, Spotify, métricas e clipboard.
+[![CI](https://github.com/T0minh0/Neon-notch/actions/workflows/ci.yml/badge.svg)](https://github.com/T0minh0/Neon-notch/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+![Platform: macOS 26+](https://img.shields.io/badge/platform-macOS%2026%2B-000000?logo=apple)
 
-## Daily Driver 0.2
+Neon Notch is a native SwiftUI utility that turns a MacBook notch into a private, local control surface for coding agents, Spotify, system metrics, and recent clipboard items.
 
-- Primeiro uso retomável com diagnóstico de instalação, helper, Codex, Claude Code, notificações, Automação e início no login.
-- Atalho global padrão `Control + Option + Space`, configurável em Ajustes, com navegação integral por teclado.
-- Hooks schema v2 deduplicados, snapshots atômicos e retenção local limitada; eventos antigos não repetem alertas após relaunch.
-- Notificações de atenção abrem a sessão correspondente e oferecem fallback recuperável na central.
+> **Early alpha:** Neon Notch is actively evolving. Expect rough edges, changing integration behavior, and no compatibility guarantee between pre-release versions.
 
-## Executar
+![Expanded Neon Notch panel](docs/assets/neon-notch-hero.png)
 
-Requisitos: macOS 26+, Xcode 26.6+ e Swift 6.3. O comando abaixo continua sendo o fluxo Debug e não altera a instalação pessoal.
+## Highlights
+
+- Follow recent Codex and Claude Code activity, including attention-needed states.
+- Install a small local helper and merge hooks through the app's onboarding or Settings.
+- Control Spotify, review metrics, and keep a short, local clipboard history from one panel.
+- Use the default global shortcut, `Control + Option + Space`, or set your own.
+- Keep data on your Mac: no analytics, remote telemetry, or account is required.
+
+## Requirements
+
+- macOS 26 or later
+- Xcode 26.6 or later with Swift 6.3 support
+- A MacBook with a notch for the intended presentation (the app can still build without one)
+
+## Build from source
+
+The supported Debug workflow builds the app and its `NeonNotchHook` helper without signing your personal installation:
 
 ```bash
 ./script/build_and_run.sh
 ```
 
-O script compila o app e o helper, incorpora `NeonNotchHook` em `Contents/Helpers` e abre o bundle gerado em:
+The generated bundle is at `DerivedData/Build/Products/Debug/Neon Notch.app`. To build only, pass `--build-only`.
 
-```text
-DerivedData/Build/Products/Debug/Neon Notch.app
-```
-
-Os hooks do Codex e Claude Code **não são instalados durante o build**. A instalação acontece somente pelo onboarding ou por Ajustes → Integrações, sempre com backup e merge idempotente.
-
-## Instalação pessoal assinada
-
-Na primeira vez, crie a identidade local de code signing no Keychain. O macOS pode pedir sua confirmação:
+For a signed personal Release install, first create the local signing identity and then run the installer:
 
 ```bash
 ./script/setup_local_signing.sh
-```
-
-Depois, compile, assine, valide e instale a versão Release em `~/Applications`:
-
-```bash
 ./script/build_and_install.sh
 ```
 
-Esse fluxo nunca usa assinatura ad hoc. O helper é assinado antes do app, o bundle é validado com `codesign --deep --strict` e a troca é transacional. A versão instalada anterior permanece recuperável em `~/Applications/Neon Notch.previous.app` após uma atualização bem-sucedida.
+The Release script installs to `~/Applications`, signs the helper before the app, verifies the bundle, and keeps the previous app bundle for recovery. It intentionally does not use ad-hoc signing. See the [installation guide](docs/installation.md) before running it.
 
-## Testes
+## Onboarding and permissions
+
+On first launch, complete or defer the in-app onboarding. It checks the Release install location, installs the local helper, configures Codex and Claude Code, requests notifications, tests Spotify and Terminal Automation, and can enable launch at login.
+
+Codex requires an explicit trust decision: after configuring its hook, run `/hooks` in Codex, inspect `NeonNotchHook`, and confirm trust yourself. The app never automates that approval. Claude Code hooks take effect in a new session after configuration.
+
+Notifications and Automation are optional. If macOS denies either, use the recovery actions in Settings or the [troubleshooting guide](docs/troubleshooting.md).
+
+## Privacy and limitations
+
+Neon Notch stores its working data locally in Application Support. The helper records only sanitized event metadata; prompts, responses, commands, and tool arguments are not logged. Clipboard collection skips concealed and transient types and defaults to excluding common password-manager apps. Spotify artwork is cached locally.
+
+The app is not sandboxed by design because it integrates with local tools and Automation. It is not a security boundary, does not sync data, and does not guarantee that external Codex, Claude Code, Spotify, or macOS APIs will remain compatible. Read [privacy and security](docs/privacy-security.md) for details.
+
+## Project guide
+
+- [Installation](docs/installation.md)
+- [Architecture](docs/architecture.md)
+- [Privacy and security](docs/privacy-security.md)
+- [Troubleshooting](docs/troubleshooting.md)
+- [Design QA](docs/design-qa.md)
+- [Contributing](CONTRIBUTING.md)
+- [Support](SUPPORT.md)
+- [Security policy](SECURITY.md)
+- [Changelog](CHANGELOG.md)
+- [License](LICENSE)
+
+## Testing
+
+Run the canonical macOS test suite from the repository root:
 
 ```bash
 xcodebuild \
@@ -53,42 +84,3 @@ xcodebuild \
   CODE_SIGNING_ALLOWED=NO \
   test
 ```
-
-## Modo de demonstração
-
-O modo usado para screenshots não lê sessões, clipboard ou Spotify reais:
-
-```bash
-launchctl setenv NEON_NOTCH_DEMO 1
-launchctl setenv NEON_NOTCH_PREVIEW_STATE expanded
-launchctl setenv NEON_NOTCH_PREVIEW_SECTION clipboard
-open -n 'DerivedData/Build/Products/Debug/Neon Notch.app'
-```
-
-Estados aceitos: `collapsed`, `hoverPreview` e `expanded`. No estado expandido, a seção pode ser `agents` ou `clipboard`. Remova as variáveis depois:
-
-```bash
-launchctl unsetenv NEON_NOTCH_DEMO
-launchctl unsetenv NEON_NOTCH_PREVIEW_STATE
-launchctl unsetenv NEON_NOTCH_PREVIEW_SECTION
-```
-
-## Estrutura
-
-- `NeonNotch`: app SwiftUI e a ponte AppKit exclusiva do `NSPanel`.
-- `NeonNotchHook`: executável pequeno que recebe JSON via stdin e anexa eventos sanitizados em JSONL.
-- `NeonNotchTests`: redução de eventos, sanitização, retenção, hashing e ciclo idempotente de configurações.
-- `Design`: mock aprovado, capa de demonstração e evidências visuais locais.
-- `script/build_and_run.sh`: caminho canônico de build/run Debug para Xcode e Codex.
-- `script/build_and_install.sh`: build Release, assinatura estável e instalação pessoal transacional.
-
-## Privacidade
-
-- Sem analytics, telemetria remota ou sincronização.
-- Hooks persistem apenas fonte, evento, IDs, diretório, timestamp e motivo curto sanitizado.
-- Prompts, respostas, comandos e parâmetros de ferramentas não entram no log.
-- Clipboard ignora tipos confidenciais/transitórios e apps configurados pelo usuário.
-- Arquivos copiados são referenciados; não são duplicados.
-- Capas do Spotify são armazenadas somente no cache local do app.
-
-O App Sandbox permanece desativado por design. O bundle ID é `com.cammis.NeonNotch`.
